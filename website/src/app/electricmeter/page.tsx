@@ -5,9 +5,16 @@ import { axiosConfig } from "@/utils/axiosConfig";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Select from "react-select";
+import { randomcolour } from "@/utils/colour";
 
 const Electricmeter: FC = () => {
-  const [electricrmeter, setElectricrmeter] = useState([]);
+  const [electricrmeter, setElectricrmeter] = useState<any>([]);
+  const [selectElectricrmeter, setSelectElectricrmeter] = useState<any>([]);
+  const [search, setSearch] = useState("");
+  const [selectedPosition, setSelectedPosition] = useState("ทั้งหมด");
+  const [popupImage, setPopupImage] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
   useEffect(() => {
     fetchElectricrmeter();
@@ -19,15 +26,35 @@ const Electricmeter: FC = () => {
       const imageBase64 = response.data.image;
       setElectricrmeter(imageBase64);
       setElectricrmeter(response.data);
-      console.log("data: ", response.data);
+      if (response.data) {
+        const categorycolour = response.data?.category.map((category: any) => ({
+          name: category,
+          colour: randomcolour(),
+        }));
+        setElectricrmeter({
+          category: categorycolour,
+          data: response.data.data,
+        });
+        const categoryfilter = response.data?.category.map((category: any) => ({
+          label: category,
+          value: category,
+        }));
+        setSelectElectricrmeter([{ label: "ทั้งหมด", value: "ทั้งหมด" }, ...categoryfilter]);
+        console.log("Chart data Water:", response.data);
+      }
     } catch (error) {
       console.error("Error fetching watermeter data:", error);
     }
   };
 
-  const [search, setSearch] = useState("");
-  const [selectedPosition, setSelectedPosition] = useState("ทั้งหมด");
-  const [popupImage, setPopupImage] = useState(null);
+  const goToPreviousPage = () => {
+    setCurrentPage((prevPage) => prevPage - 1);
+  };
+
+  const goToNextPage = () => {
+    setCurrentPage((prevPage) => prevPage + 1);
+  };
+
   const handleImageClick = (imageUrl: any) => {
     setPopupImage(imageUrl);
   };
@@ -35,6 +62,10 @@ const Electricmeter: FC = () => {
   const handleClosePopup = () => {
     setPopupImage(null);
   };
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const totalPages = Math.ceil(electricrmeter?.data?.length / itemsPerPage);
 
   return (
     <Layout>
@@ -73,15 +104,11 @@ const Electricmeter: FC = () => {
           <div className="flex justify-start items-center  2xl:w-[17%] xl:w-[20%] lg:w-[28%] w-[35%] flex-wrap">
             <Select
               value={{ label: selectedPosition, value: selectedPosition }}
-              onChange={(selectedOption: any) =>
+              onChange={(selectedOption: any) => {
                 setSelectedPosition(selectedOption.value)
-              }
-              options={[
-                { label: "ทั้งหมด", value: "ทั้งหมด" },
-                { label: "ชั้นที่ 1", value: "ชั้นที่ 1" },
-                { label: "ชั้นที่ 2", value: "ชั้นที่ 2" },
-                { label: "ชั้นที่ 3", value: "ชั้นที่ 3" },
-              ]}
+                setCurrentPage(1)
+              }}
+              options={selectElectricrmeter}
             />
           </div>
         </div>
@@ -94,7 +121,7 @@ const Electricmeter: FC = () => {
             <h4 className="w-[50%]">รูปภาพ</h4>
           </div>
           <div className="w-[92em]">
-            {electricrmeter
+            {electricrmeter?.data
               ?.filter((item: any) => {
                 if (selectedPosition === "ทั้งหมด") return true;
                 return item.name === selectedPosition;
@@ -108,11 +135,11 @@ const Electricmeter: FC = () => {
                   searchKeywords.length === 0 ||
                   searchKeywords.every(
                     (keyword) =>
-                      item.datetime.toLowerCase().includes(keyword) ||
-                      item.name.toLowerCase().includes(keyword)
+                      item.datetime.toLowerCase().includes(keyword) || item.name.toLowerCase().includes(keyword)
                   )
                 );
               })
+              .slice(startIndex, endIndex)
               .map((item: any, idx: any) => (
                 <div
                   key={idx}
@@ -123,14 +150,28 @@ const Electricmeter: FC = () => {
                   <p className="text-left w-[50%]">{item.value}</p>
                   <p
                     className="text-left w-[50%] underline cursor-pointer"
-                    onClick={() =>
-                      handleImageClick(`data:image/png;base64,${item.image}`)
-                    }
+                    onClick={() => handleImageClick(`data:image/png;base64,${item.image}`)}
                   >
                     รูปภาพ
                   </p>
                 </div>
               ))}
+          </div>
+          <div className="flex justify-center mt-4">
+            <button
+              onClick={goToPreviousPage}
+              disabled={currentPage === 1}
+              className="px-4 py-2 bg-gray-200 rounded-md mr-2"
+            >
+              ก่อนหน้า
+            </button>
+            <button
+              onClick={goToNextPage}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 bg-gray-200 rounded-md ml-1"
+            >
+              ถัดไป
+            </button>
           </div>
         </div>
       </div>

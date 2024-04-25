@@ -1,31 +1,41 @@
 "use client";
 import Layout from "@/layout";
 import { FC, useEffect, useState } from "react";
-import { Chart as ChartJS, defaults } from "chart.js/auto";
+import { Chart as ChartJS, Colors, defaults } from "chart.js/auto";
 import "chart.js/auto";
 import { Line, Bar, Doughnut, Pie } from "react-chartjs-2";
 import { axiosConfig } from "@/utils/axiosConfig";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Select from "react-select";
+import { randomcolour } from "@/utils/colour";
 
 defaults.maintainAspectRatio = false;
 defaults.responsive = true;
 
 const Chart: FC = () => {
-  const [chartDataWater, setChartDataWater] = useState<any[]>([]);
-  const [chartDataElect, setChartDataElect] = useState<any[]>([]);
-  const [ChartDataWaterBillMonth, setChartDataWaterBillMonth] = useState<any[]>([]);
-  const [ChartDataElectBillMonth, setChartDataElectBillMonth] = useState<any[]>([]);
-  const [ChartDataElectBillUnitPerFloor, setChartDataElectBillUnitPerFloor] =useState<any[]>([]);
-  const [ChartDataWaterBillUnitPerFloor, setChartDataWaterBillUnitPerFloor] =useState<any[]>([]);
-  const [ChartDataWaterBillYear, setChartDataWaterBillYear] = useState<any[]>([]);
-  const [ChartDataElectBillYear, setChartDataElectBillYear] = useState<any[]>([]);
-  const [ChartDataWaterBillMonthChart, setChartDataWaterBillMonthChart] =useState<any[]>([]);
-  const [ChartDatElectBillMonthChart, setChartDataElectBillMonthChart] =useState<any[]>([]);
-  
+  const [chartDataWater, setChartDataWater] = useState<any>([]);
+  const [chartDataElect, setChartDataElect] = useState<any>([]);
+  const [ChartDataWaterBillMonth, setChartDataWaterBillMonth] = useState<any>(
+    []
+  );
+  const [ChartDataElectBillMonth, setChartDataElectBillMonth] = useState<any>(
+    []
+  );
+  // const [ChartDataElectBillUnitPerFloor, setChartDataElectBillUnitPerFloor] =useState<any[]>([]);
+  // const [ChartDataWaterBillUnitPerFloor, setChartDataWaterBillUnitPerFloor] =useState<any[]>([]);
+  const [ChartDataWaterBillYear, setChartDataWaterBillYear] = useState<any>([]);
+  const [ChartDataElectBillYear, setChartDataElectBillYear] = useState<any>([]);
+  const [ChartDataWaterBillMonthChart, setChartDataWaterBillMonthChart] =
+    useState<any[]>([]);
+  const [ChartDatElectBillMonthChart, setChartDataElectBillMonthChart] =
+    useState<any>([]);
+
   const [waterrmeter, setWatermeter] = useState([]);
-  const [electricrmeter, setElectricrmeter] = useState([])
+  const [electricrmeter, setElectricrmeter] = useState([]);
+
+  const [configelectric, setConfigelectric] = useState([]);
+  const [configwater, setConfigwater] = useState([]);
 
   useEffect(() => {
     fetchChartDataWater();
@@ -36,11 +46,33 @@ const Chart: FC = () => {
     fetchChartDataElectBillYear();
     fetchChartDataWaterBillMonthChart();
     fetchChartDataElectBillMonthChart();
-    fetchChartDataElectBillUnitPerFloor();
-    fetchChartDataWaterBillUnitPerFloor();
+    // fetchChartDataElectBillUnitPerFloor();
+    // fetchChartDataWaterBillUnitPerFloor();
     fetchElectricrmeter();
     fetchWatermeter();
+    fetchConfigelectric();
+    fetchConfigwater();
   }, []);
+
+  const fetchConfigelectric = async () => {
+    try {
+      const response = await axiosConfig.get("/api/configelectric");
+      setElectricrmeter(response.data);
+      console.log("configelect:", response.data);
+    } catch (error) {
+      console.error("Error fetching configelect:", error);
+    }
+  };
+
+  const fetchConfigwater = async () => {
+    try {
+      const response = await axiosConfig.get("/api/configwater");
+      setElectricrmeter(response.data);
+      console.log("configwater:", response.data);
+    } catch (error) {
+      console.error("configwater:", error);
+    }
+  };
 
   const fetchElectricrmeter = async () => {
     try {
@@ -65,8 +97,17 @@ const Chart: FC = () => {
   const fetchChartDataWater = async () => {
     try {
       const response = await axiosConfig.get("/api/data_chart_water");
-      setChartDataWater(response.data);
-      console.log("Chart data Water:", response.data);
+      if (response.data) {
+        const categorycolour = response.data?.category.map((category: any) => ({
+          name: category,
+          colour: randomcolour(),
+        }));
+        setChartDataWater({
+          category: categorycolour,
+          data: response.data.data,
+        });
+        console.log("Chart data Water:", response.data);
+      }
     } catch (error) {
       console.error("Error fetching chart data Water:", error);
     }
@@ -75,8 +116,17 @@ const Chart: FC = () => {
   const fetchChartDataElect = async () => {
     try {
       const response = await axiosConfig.get("/api/data_chart_elect");
-      setChartDataElect(response.data);
-      console.log("Chart data Elect:", response.data);
+      if (response.data) {
+        const categorycolour = response.data?.category.map((category: any) => ({
+          name: category,
+          colour: randomcolour(),
+        }));
+        setChartDataElect({
+          category: categorycolour,
+          data: response.data.data,
+        });
+        console.log("Chart data Elect:", response.data);
+      }
     } catch (error) {
       console.error("Error fetching chart data Elect:", error);
     }
@@ -85,8 +135,17 @@ const Chart: FC = () => {
   const fetchChartDataElectBillMonth = async () => {
     try {
       const response = await axiosConfig.get("/api/data_electricbillmonth");
-      setChartDataElectBillMonth(response.data);
-      console.log("Chart data Elect Bill Month:", response.data);
+      if (response.data) {
+        const categorycolour = response.data?.category.map((category: any) => ({
+          name: category,
+          colour: randomcolour(),
+        }));
+        setChartDataElectBillMonth({
+          category: categorycolour,
+          data: response.data.data,
+        });
+        console.log("chart data Elect Bill Month :", response.data);
+      }
     } catch (error) {
       console.error("Error fetching chart data Elect Bill Month:", error);
     }
@@ -95,48 +154,36 @@ const Chart: FC = () => {
   const fetchChartDataWaterBillMonth = async () => {
     try {
       const response = await axiosConfig.get("/api/data_waterbillmonth");
-      setChartDataWaterBillMonth(response.data);
-      console.log("Chart data Water Bill Month:", response.data);
+      if (response.data) {
+        const categorycolour = response.data?.category.map((category: any) => ({
+          name: category,
+          colour: randomcolour(),
+        }));
+        setChartDataWaterBillMonth({
+          category: categorycolour,
+          data: response.data.data,
+        });
+        console.log("chart data water Bill Month :", response.data);
+      }
     } catch (error) {
       console.error("Error fetching chart data Water Bill Month:", error);
     }
   };
-
-  const fetchChartDataElectBillUnitPerFloor = async () => {
-    try {
-      const response = await axiosConfig.get(
-        "/api/data_electricbillunitperfloor"
-      );
-      setChartDataElectBillUnitPerFloor(response.data);
-      console.log("Chart data Elect Bill UnitPerFloor:", response.data);
-    } catch (error) {
-      console.error(
-        "Error fetching chart data Elect Bill UnitPerFloor:",
-        error
-      );
-    }
-  };
-
-  const fetchChartDataWaterBillUnitPerFloor = async () => {
-    try {
-      const response = await axiosConfig.get(
-        "/api/data_watericbillunitperfloor"
-      );
-      setChartDataWaterBillUnitPerFloor(response.data);
-      console.log("Chart data Water Bill UnitPerFloor:", response.data);
-    } catch (error) {
-      console.error(
-        "Error fetching chart data Water Bill UnitPerFloor:",
-        error
-      );
-    }
-  };
-
+  
   const fetchChartDataElectBillYear = async () => {
     try {
       const response = await axiosConfig.get("/api/data_electricbillyear");
-      setChartDataElectBillYear(response.data);
-      console.log("Chart data Elect Bill Year:", response.data);
+      if (response.data) {
+        const categorycolour = response.data?.category.map((category: any) => ({
+          name: category,
+          colour: randomcolour(),
+        }));
+        setChartDataElectBillYear({
+          category: categorycolour,
+          data: response.data.data,
+        });
+        console.log("chart data Elect Bill Year:", response.data);
+      }
     } catch (error) {
       console.error("Error fetching chart data Elect Bill Year:", error);
     }
@@ -145,8 +192,17 @@ const Chart: FC = () => {
   const fetchChartDataWaterBillYear = async () => {
     try {
       const response = await axiosConfig.get("/api/data_waterbillyear");
-      setChartDataWaterBillYear(response.data);
-      console.log("Chart data Water Bill Year:", response.data);
+      if (response.data) {
+        const categorycolour = response.data?.category.map((category: any) => ({
+          name: category,
+          colour: randomcolour(),
+        }));
+        setChartDataWaterBillYear({
+          category: categorycolour,
+          data: response.data.data,
+        });
+        console.log("chart data Water Bill Year:", response.data);
+      }
     } catch (error) {
       console.error("Error fetching chart data Water Bill Year:", error);
     }
@@ -157,8 +213,17 @@ const Chart: FC = () => {
       const response = await axiosConfig.get(
         "/api/data_electricbillmonthChart"
       );
-      setChartDataElectBillMonthChart(response.data);
-      console.log("Chart data Elect Bill Month Chart:", response.data);
+      if (response.data) {
+        const categorycolour = response.data?.category.map((category: any) => ({
+          name: category,
+          colour: randomcolour(),
+        }));
+        setChartDataElectBillMonthChart({
+          category: categorycolour,
+          data: response.data.data,
+        });
+        console.log("chart data Elect Bill Month Chart:", response.data);
+      }
     } catch (error) {
       console.error("Error fetching chart data Elect Bill Month Chart:", error);
     }
@@ -174,10 +239,8 @@ const Chart: FC = () => {
     }
   };
 
- 
   const [selectedPosition, setSelectedPosition] = useState("ทั้งหมด");
   const [selectedPositionWater, setSelectedPositionWater] = useState("ทั้งหมด");
- 
 
   return (
     <Layout>
@@ -195,31 +258,27 @@ const Chart: FC = () => {
             </div>
 
             <div className="w-full h-[300px] px-3 py-5">
-              <Line
-                data={{
-                  labels: chartDataWater
-                    .filter((data) => data.name === "ชั้นที่ 1")
-                    .map((data) => data.time),
-                  datasets: [
-                    {
-                      label: "ชั้นที่ 1",
-                      data: chartDataWater
-                        .filter((data) => data.name === "ชั้นที่ 1")
-                        .map((data) => data.value.toString()),
-                      backgroundColor: "#055C9D",
-                      borderColor: "#055C9D",
-                    },
-                    {
-                      label: "ชั้นที่ 2",
-                      data: chartDataWater
-                        .filter((data) => data.name === "ชั้นที่ 2")
-                        .map((data) => data.value.toString()),
-                      backgroundColor: "#FFC700",
-                      borderColor: "#FFC700",
-                    },
-                  ],
-                }}
-              />
+              {chartDataWater.data !== undefined && (
+                <Line
+                  data={{
+                    labels: chartDataWater?.data?.map((data: any) => data.time),
+                    datasets: chartDataWater?.category?.map((category: any) => {
+                      const filterdata = chartDataWater.data.filter(
+                        (data: any) => data.name === category.name
+                      );
+                      const colour = randomcolour();
+                      return {
+                        label: category.name,
+                        data: filterdata.map((data: any) =>
+                          data.value.toString()
+                        ),
+                        backgroundColor: category.colour,
+                        borderColor: category.colour,
+                      };
+                    }),
+                  }}
+                />
+              )}
             </div>
           </div>
           <div className="bg-white w-2/4 h-4/5 rounded-md border border-slate-300 drop-shadow-lg">
@@ -232,167 +291,32 @@ const Chart: FC = () => {
               </h1>
             </div>
             <div className="w-full h-[300px] px-3 py-5">
-              <Line
-                data={{
-                  labels: chartDataElect
-                    .filter((data) => data.name === "ชั้นที่ 1")
-                    .map((data) => data.time),
-                  datasets: [
-                    {
-                      label: "ชั้นที่ 1",
-                      data: chartDataElect
-                        .filter((data) => data.name === "ชั้นที่ 1")
-                        .map((data) => data.value.toString()),
-                      backgroundColor: "#055C9D",
-                      borderColor: "#055C9D",
-                    },
-                    {
-                      label: "ชั้นที่ 2",
-                      data: chartDataElect
-                        .filter((data) => data.name === "ชั้นที่ 2")
-                        .map((data) => data.value.toString()),
-                      backgroundColor: "#FFC700",
-                      borderColor: "#FFC700",
-                    },
-                    {
-                      label: "ชั้นที่ 3",
-                      data: chartDataElect
-                        .filter((data) => data.name === "ชั้นที่ 3")
-                        .map((data) => data.value.toString()),
-                      backgroundColor: "#00A67E",
-                      borderColor: "#00A67E",
-                    },
-                  ],
-                }}
-              />
+              {chartDataElect.data !== undefined && (
+                <Line
+                  data={{
+                    labels: chartDataElect?.data?.map((data: any) => data.time),
+                    datasets: chartDataElect?.category?.map((category: any) => {
+                      const filterdata = chartDataElect.data.filter(
+                        (data: any) => data.name === category.name
+                      );
+                      const colour = randomcolour();
+                      return {
+                        label: category.name,
+                        data: filterdata.map((data: any) =>
+                          data.value.toString()
+                        ),
+                        backgroundColor: category.colour,
+                        borderColor: category.colour,
+                      };
+                    }),
+                  }}
+                />
+              )}
             </div>
           </div>
         </div>
         <div className="flex justify-center pt-5 gap-3">
-        <div className="bg-white w-[25%] h-full rounded-md border border-slate-300 drop-shadow-lg">
-            <h1 className="px-5 pb-2 pt-5 text-black/80 text-[24px] font-[600]">
-              ค่าใช้จ่ายรายเดือนต่อชั้น
-            </h1>
-            <div className="flex justify-center items-center">
-              <h1 className="px-5 pb-2 pt-5 text-black/80 text-[24px] font-[600]">
-                ไฟ
-              </h1>
-            </div>
-            <div className="w-full h-[300px] px-3 py-5">
-              <Doughnut
-                data={{
-                  labels: ChartDataElectBillMonth.filter(
-                    (data) => data.year === 2024
-                  ).map((data) => {
-                    const monthNames = [
-                      "",
-                      "Jan",
-                      "Feb",
-                      "Mar",
-                      "Apr",
-                      "May",
-                      "Jun",
-                      "Jul",
-                      "Aug",
-                      "Sep",
-                      "Oct",
-                      "Nov",
-                      "Dec",
-                    ];
-                    return monthNames[data.month];
-                  }),
-                  datasets: [
-                    {
-                      label: "ชั้น 1 ค่าใช้จ่าย",
-                      data: ChartDataElectBillUnitPerFloor.filter(
-                        (data) => data.year === 2024 && data.name === "ชั้น 1"
-                      ).map((data) => data.total_bill),
-                      backgroundColor: [
-                        "#FFC700",
-                        "#Ff5733",
-                        "#d1c4e9",
-                        "#00bcd4",
-                        "#dbbc8c",
-                      ],
-                    },
-                    {
-                      label: "ชั้น 2 ค่าใช้จ่าย",
-                      data: ChartDataElectBillUnitPerFloor.filter(
-                        (data) => data.year === 2024 && data.name === "ชั้น 2"
-                      ).map((data) => data.total_bill),
-                      backgroundColor: [
-                        "#FFC700",
-                        "#Ff5733",
-                        "#d1c4e9",
-                        "#00bcd4",
-                        "#dbbc8c",
-                      ],
-                    },
-                  ],
-                }}
-              />
-            </div>
-            <div className="flex justify-center items-center">
-              <h1 className="px-5 pb-2 pt-5 text-black/80 text-[24px] font-[600]">
-                น้ำ
-              </h1>
-            </div>
-            <div className="w-full h-[300px] px-3 py-5">
-              <Doughnut
-                data={{
-                  labels: ChartDataWaterBillMonth.filter(
-                    (data) => data.year === 2024
-                  ).map((data) => {
-                    const monthNames = [
-                      "",
-                      "Jan",
-                      "Feb",
-                      "Mar",
-                      "Apr",
-                      "May",
-                      "Jun",
-                      "Jul",
-                      "Aug",
-                      "Sep",
-                      "Oct",
-                      "Nov",
-                      "Dec",
-                    ];
-                    return monthNames[data.month];
-                  }),
-                  datasets: [
-                    {
-                      label: "ชั้น 1 ค่าใช้จ่าย",
-                      data: ChartDataWaterBillUnitPerFloor.filter(
-                        (data) => data.year === 2024 && data.name === "ชั้น 1"
-                      ).map((data) => data.total_bill),
-                      backgroundColor: [
-                        "#FFC700",
-                        "#Ff5733",
-                        "#d1c4e9",
-                        "#00bcd4",
-                        "#dbbc8c",
-                      ],
-                    },
-                    {
-                      label: "ชั้น 2 ค่าใช้จ่าย",
-                      data: ChartDataWaterBillUnitPerFloor.filter(
-                        (data) => data.year === 2024 && data.name === "ชั้น 2"
-                      ).map((data) => data.total_bill),
-                      backgroundColor: [
-                        "#FFC700",
-                        "#Ff5733",
-                        "#d1c4e9",
-                        "#00bcd4",
-                        "#dbbc8c",
-                      ],
-                    },
-                  ],
-                }}
-              />
-            </div>
-          </div>
-          <div className="bg-white w-[50%] h-2/5 rounded-md border border-slate-300 drop-shadow-lg">
+          <div className="bg-white w-[100%] h-2/5 rounded-md border border-slate-300 drop-shadow-lg">
             <h1 className="px-5 pb-2 pt-5 text-black/80 text-[24px] font-[600]">
               ค่าใช้จ่ายรายเดือน
             </h1>
@@ -402,56 +326,73 @@ const Chart: FC = () => {
               </h1>
             </div>
             <div className="w-full h-[300px] px-3 py-5">
-              <Bar
-                data={{
-                  labels: ChartDataWaterBillMonth.filter(
-                    (data) => data.year === 2024
-                  ).map((data) => {
-                    const monthNames = [
-                      "",
-                      "Jan",
-                      "Feb",
-                      "Mar",
-                      "Apr",
-                      "May",
-                      "Jun",
-                      "Jul",
-                      "Aug",
-                      "Sep",
-                      "Oct",
-                      "Nov",
-                      "Dec",
-                    ];
-                    return monthNames[data.month];
-                  }),
-                  datasets: [
-                    {
-                      label: "2024",
-                      data: ChartDataWaterBillMonth.filter(
-                        (data) => data.year === 2024
-                      ).map((data) => data.total_bill),
-                      backgroundColor: "#FFC700",
-                      borderColor: "#FFC700",
-                    },
-                    {
-                      label: "2025",
-                      data: ChartDataWaterBillMonth.filter(
-                        (data) => data.year === 2025
-                      ).map((data) => data.total_bill),
-                      backgroundColor: "#055C9D",
-                      borderColor: "#055C9D",
-                    },
-                    {
-                      label: "2026",
-                      data: ChartDataWaterBillMonth.filter(
-                        (data) => data.year === 2026
-                      ).map((data) => data.total_bill),
-                      backgroundColor: "#00A67E",
-                      borderColor: "#00A67E",
-                    },
-                  ],
-                }}
-              />
+              {
+                ChartDataWaterBillMonth.data !== undefined && (
+                  <Bar
+                  data={{
+                    labels: ChartDataWaterBillMonth?.data
+                      ?.reduce(
+                        (uniqueMonths: string[], data: any) => {
+                          const monthNames = [
+                            "",
+                            "Jan",
+                            "Feb",
+                            "Mar",
+                            "Apr",
+                            "May",
+                            "Jun",
+                            "Jul",
+                            "Aug",
+                            "Sep",
+                            "Oct",
+                            "Nov",
+                            "Dec",
+                          ];
+                          const monthLabel = monthNames[data.month];
+                          if (!uniqueMonths.includes(monthLabel)) {
+                            uniqueMonths.push(monthLabel);
+                          }
+                          return uniqueMonths;
+                        },
+                        []
+                      )
+                      ?.sort((a:any, b: any) => {
+                        const monthNames = [
+                          "Jan",
+                          "Feb",
+                          "Mar",
+                          "Apr",
+                          "May",
+                          "Jun",
+                          "Jul",
+                          "Aug",
+                          "Sep",
+                          "Oct",
+                          "Nov",
+                          "Dec",
+                        ];
+                        return monthNames.indexOf(a) - monthNames.indexOf(b);
+                      }),
+                    datasets: ChartDataWaterBillMonth?.category?.map(
+                      (category: any) => {
+                        const filterdata = ChartDataWaterBillMonth.data.filter(
+                          (data: any) => data.year === category.name
+                        );
+                        const colour = randomcolour();
+                        return {
+                          label: category.name?.toString(),
+                          data: filterdata.map((data: any) =>
+                            data.total_bill.toString()
+                          ),
+                          backgroundColor: category.colour,
+                          borderColor: category.colour,
+                        };
+                      }
+                    ),
+                  }}
+                />
+                )
+              }
             </div>
             <div className="flex justify-center items-center">
               <h1 className="px-5 pb-2 pt-5 text-black/80 text-[24px] font-[600]">
@@ -459,185 +400,57 @@ const Chart: FC = () => {
               </h1>
             </div>
             <div className="w-full h-[300px] px-3 py-5">
-              <Bar
-                data={{
-                  labels: ChartDataElectBillMonth.filter(
-                    (data) => data.year === 2024
-                  ).map((data) => {
-                    const monthNames = [
-                      "",
-                      "Jan",
-                      "Feb",
-                      "Mar",
-                      "Apr",
-                      "May",
-                      "Jun",
-                      "Jul",
-                      "Aug",
-                      "Sep",
-                      "Oct",
-                      "Nov",
-                      "Dec",
-                    ];
-                    return monthNames[data.month];
-                  }),
-                  datasets: [
-                    {
-                      label: "2024",
-                      data: ChartDataElectBillMonth.filter(
-                        (data) => data.year === 2024
-                      ).map((data) => data.total_bill),
-                      backgroundColor: "#FFC700",
-                      borderColor: "#FFC700",
-                    },
-                    {
-                      label: "2025",
-                      data: ChartDataElectBillMonth.filter(
-                        (data) => data.year === 2025
-                      ).map((data) => data.total_bill),
-                      backgroundColor: "#055C9D",
-                      borderColor: "#055C9D",
-                    },
-                    {
-                      label: "2026",
-                      data: ChartDataElectBillMonth.filter(
-                        (data) => data.year === 2026
-                      ).map((data) => data.total_bill),
-                      backgroundColor: "#00A67E",
-                      borderColor: "#00A67E",
-                    },
-                  ],
-                }}
-              />
+              {ChartDataElectBillMonth.data !== undefined && (
+                <Bar
+                  data={{
+                    labels: ChartDataElectBillMonth?.data?.reduce(
+                      (uniqueMonths: string[], data: any) => {
+                        const monthNames = [
+                          "",
+                          "Jan",
+                          "Feb",
+                          "Mar",
+                          "Apr",
+                          "May",
+                          "Jun",
+                          "Jul",
+                          "Aug",
+                          "Sep",
+                          "Oct",
+                          "Nov",
+                          "Dec",
+                        ];
+                        const monthLabel = monthNames[data.month];
+                        if (!uniqueMonths.includes(monthLabel)) {
+                          uniqueMonths.push(monthLabel);
+                        }
+                        return uniqueMonths;
+                      },
+                      []
+                    ),
+                    datasets: ChartDataElectBillMonth?.category?.map(
+                      (category: any) => {
+                        const filterdata = ChartDataElectBillMonth.data.filter(
+                          (data: any) => data.year === category.name
+                        );
+                        const colour = randomcolour();
+                        return {
+                          label: category.name?.toString(),
+                          data: filterdata.map((data: any) =>
+                            data.total_bill.toString()
+                          ),
+                          backgroundColor: category.colour,
+                          borderColor: category.colour,
+                        };
+                      }
+                    ),
+                  }}
+                />
+              )}
             </div>
           </div>
-          <div className="bg-white w-[25%] h-2/5 rounded-md border border-slate-300 drop-shadow-lg">
-            <h1 className="px-5 pb-2 pt-5 text-black/80 text-[24px] font-[600]">
-              ยูนิตที่ใช้รายเดือนต่อชั้น
-            </h1>
-            <div className="flex justify-center items-center">
-              <h1 className="px-5 pb-2 pt-5 text-black/80 text-[24px] font-[600]">
-                น้ำ
-              </h1>
-            </div>
-            <div className="w-full h-[300px] px-3 py-5">
-              <Doughnut
-                data={{
-                  labels: ChartDataElectBillMonth.filter(
-                    (data) => data.year === 2024
-                  ).map((data) => {
-                    const monthNames = [
-                      "",
-                      "Jan",
-                      "Feb",
-                      "Mar",
-                      "Apr",
-                      "May",
-                      "Jun",
-                      "Jul",
-                      "Aug",
-                      "Sep",
-                      "Oct",
-                      "Nov",
-                      "Dec",
-                    ];
-                    return monthNames[data.month];
-                  }),
-                  datasets: [
-                    {
-                      label: "ชั้น 1 จำนวนยูนิต",
-                      data: ChartDataWaterBillUnitPerFloor.filter(
-                        (data) => data.year === 2024 && data.name === "ชั้น 1"
-                      ).map((data) => data.unit),
-                      backgroundColor: [
-                        "#FFC700",
-                        "#Ff5733",
-                        "#d1c4e9",
-                        "#00bcd4",
-                        "#dbbc8c",
-                      ],
-                    },
-                    {
-                      label: "ชั้น 2 จำนวนยูนิต",
-                      data: ChartDataWaterBillUnitPerFloor.filter(
-                        (data) => data.year === 2024 && data.name === "ชั้น 2"
-                      ).map((data) => data.unit),
-                      backgroundColor: [
-                        "#FFC700",
-                        "#Ff5733",
-                        "#d1c4e9",
-                        "#00bcd4",
-                        "#dbbc8c",
-                      ],
-                    },
-                  ],
-                }}
-              />
-            </div>
-            <div className="flex justify-center items-center">
-              <h1 className="px-5 pb-2 pt-5 text-black/80 text-[24px] font-[600]">
-                ไฟ
-              </h1>
-            </div>
-            <div className="w-[100%] h-[300px] px-3 py-5">
-              <Doughnut
-                data={{
-                  labels: ChartDataElectBillMonth.filter(
-                    (data) => data.year === 2024
-                  ).map((data) => {
-                    const monthNames = [
-                      "",
-                      "Jan",
-                      "Feb",
-                      "Mar",
-                      "Apr",
-                      "May",
-                      "Jun",
-                      "Jul",
-                      "Aug",
-                      "Sep",
-                      "Oct",
-                      "Nov",
-                      "Dec",
-                    ];
-                    return monthNames[data.month];
-                  }),
-                  datasets: [
-                    {
-                      label: "ชั้น 1 จำนวนยูนิต",
-                      data: ChartDataElectBillUnitPerFloor.filter(
-                        (data) => data.year === 2024 && data.name === "ชั้น 1"
-                      ).map((data) => data.unit),
-                      backgroundColor: [
-                        "#FFC700",
-                        "#Ff5733",
-                        "#d1c4e9",
-                        "#00bcd4",
-                        "#dbbc8c",
-                      ],
-                    },
-                    {
-                      label: "ชั้น 2 จำนวนยูนิต",
-                      data: ChartDataElectBillUnitPerFloor.filter(
-                        (data) => data.year === 2024 && data.name === "ชั้น 2"
-                      ).map((data) => data.unit),
-                      backgroundColor: [
-                        "#FFC700",
-                        "#Ff5733",
-                        "#d1c4e9",
-                        "#00bcd4",
-                        "#dbbc8c",
-                      ],
-                    },
-                  ],
-                }}
-              />
-            </div>
-          </div>
-          
         </div>
         <div className="flex justify-center pt-5 gap-3">
-          
           <div className="w-full h-1/5">
             <div className="bg-white w-[100%] h-2/5 rounded-md border border-slate-300 drop-shadow-lg mb-5">
               <h1 className="px-5 pb-2 pt-5 text-black/80 text-[24px] font-[600]">
@@ -653,12 +466,11 @@ const Chart: FC = () => {
                     }
                     options={[
                       { label: "ทั้งหมด", value: "ทั้งหมด" },
-                      { label: "ชั้น 1", value: "ชั้น 1" },
-                      { label: "ชั้น 2", value: "ชั้น 2" },
-                      { label: "ชั้น 3", value: "ชั้น 3" },
+                      { label: "ชั้นที่ 1", value: "ชั้นที่ 1" },
+                      { label: "ชั้นที่ 2", value: "ชั้นที่ 2" },
+                      { label: "ชั้นที่ 3", value: "ชั้นที่ 3" },
                     ]}
                   />
-                  
                 </div>
                 <div className="border-[1px] border-[#e6e6e6] rounded-[9px] py-2 px-8 bg-white my-5 m-auto w-full overflow-x-auto overflow-y-auto ">
                   <div className="flex w-full">
@@ -670,24 +482,24 @@ const Chart: FC = () => {
                     <h4 className="w-[50%]">ค่า unit</h4>
                   </div>
                   <div className="w-full">
-                  {electricrmeter
-              ?.filter((item: any) => {
-                if (selectedPosition === "ทั้งหมด") return true;
-                return item.name === selectedPosition;
-              })
-              .map((item: any, idx: any) => (
-                <div
-                  key={idx}
-                  className="my-2 px-2 flex justify-start items-center  w-auto rounded-lg hover:bg-blue-200 overflow-y-auto h-[20%]"
-                >
-                  <p className="text-left w-[48%]">{item.month}</p>
-                  <p className="text-left w-[50%]">{item.year}</p>
-                  <p className="text-left w-[50%]">{item.name}</p>
-                  <p className="text-left w-[51%]">{item.bill}</p>
-                  <p className="text-left w-[50%]">{item.ft}</p>
-                  <p className="text-left w-[49%]">{item.unit}</p>
-                </div>
-              ))}
+                    {electricrmeter
+                      ?.filter((item: any) => {
+                        if (selectedPosition === "ทั้งหมด") return true;
+                        return item.name === selectedPosition;
+                      })
+                      .map((item: any, idx: any) => (
+                        <div
+                          key={idx}
+                          className="my-2 px-2 flex justify-start items-center  w-auto rounded-lg hover:bg-blue-200 overflow-y-auto h-[20%]"
+                        >
+                          <p className="text-left w-[48%]">{item.month}</p>
+                          <p className="text-left w-[50%]">{item.year}</p>
+                          <p className="text-left w-[50%]">{item.name}</p>
+                          <p className="text-left w-[51%]">{item.bill}</p>
+                          <p className="text-left w-[50%]">{item.ft}</p>
+                          <p className="text-left w-[49%]">{item.unit}</p>
+                        </div>
+                      ))}
                   </div>
                 </div>
               </div>
@@ -699,15 +511,18 @@ const Chart: FC = () => {
               <div className="flex justify-start items-center gap-4 2xl:w-[88%] xl:w-[86%] lg:w-[80%] flex-wrap mt-3 px-5">
                 <div className="flex justify-start items-center  2xl:w-[17%] xl:w-[20%] lg:w-[28%] w-[35%] flex-wrap">
                   <Select
-                    value={{ label: selectedPositionWater, value: selectedPositionWater }}
+                    value={{
+                      label: selectedPositionWater,
+                      value: selectedPositionWater,
+                    }}
                     onChange={(selectedPositionWater: any) =>
                       setSelectedPositionWater(selectedPositionWater.value)
                     }
                     options={[
                       { label: "ทั้งหมด", value: "ทั้งหมด" },
-                      { label: "ชั้น 1", value: "ชั้น 1" },
-                      { label: "ชั้น 2", value: "ชั้น 2" },
-                      { label: "ชั้น 3", value: "ชั้น 3" },
+                      { label: "ชั้นที่ 1", value: "ชั้นที่ 1" },
+                      { label: "ชั้นที่ 2", value: "ชั้นที่ 2" },
+                      { label: "ชั้นที่ 3", value: "ชั้นที่ 3" },
                     ]}
                   />
                 </div>
@@ -720,23 +535,23 @@ const Chart: FC = () => {
                     <h4 className="w-[52%]">ค่า unit</h4>
                   </div>
                   <div className="w-full">
-                  {waterrmeter
-              ?.filter((item: any) => {
-                if (selectedPositionWater === "ทั้งหมด") return true;
-                return item.name === selectedPositionWater;
-              })
-              .map((item: any, idx: any) => (
-                <div
-                  key={idx}
-                  className="my-2 px-2 flex justify-start items-center  w-auto rounded-lg hover:bg-blue-200 overflow-y-auto h-[20%]"
-                >
-                  <p className="text-left w-[49%]">{item.month}</p>
-                  <p className="text-left w-[50%]">{item.year}</p>
-                  <p className="text-left w-[51%]">{item.name}</p>
-                  <p className="text-left w-[51%]">{item.bill}</p>
-                  <p className="text-left w-[50%]">{item.unit}</p>
-                </div>
-              ))}
+                    {waterrmeter
+                      ?.filter((item: any) => {
+                        if (selectedPositionWater === "ทั้งหมด") return true;
+                        return item.name === selectedPositionWater;
+                      })
+                      .map((item: any, idx: any) => (
+                        <div
+                          key={idx}
+                          className="my-2 px-2 flex justify-start items-center  w-auto rounded-lg hover:bg-blue-200 overflow-y-auto h-[20%]"
+                        >
+                          <p className="text-left w-[49%]">{item.month}</p>
+                          <p className="text-left w-[50%]">{item.year}</p>
+                          <p className="text-left w-[51%]">{item.name}</p>
+                          <p className="text-left w-[51%]">{item.bill}</p>
+                          <p className="text-left w-[50%]">{item.unit}</p>
+                        </div>
+                      ))}
                   </div>
                 </div>
               </div>
@@ -744,34 +559,67 @@ const Chart: FC = () => {
           </div>
         </div>
         <div className="flex justify-center pt-5 gap-3">
-          <div className="bg-white w-[100%] h-1/5 rounded-md border border-slate-300 drop-shadow-lg">
+          <div className="bg-white w-[100%] h-2/5 rounded-md border border-slate-300 drop-shadow-lg">
             <h1 className="px-5 pb-2 pt-5 text-black/80 text-[24px] font-[600]">
               ค่าใช้จ่ายรายปี
             </h1>
+            <div className="flex justify-center items-center">
+              <h1 className="px-5 pb-2 pt-5 text-black/80 text-[24px] font-[600]">
+                น้ำ
+              </h1>
+            </div>
             <div className="w-full h-[300px] px-3 py-5">
-              <Bar
+              {ChartDataWaterBillYear.data !== undefined && (
+                <Bar
                 data={{
-                  labels: ChartDataWaterBillYear.map((data) => data.year),
+                  labels: ChartDataWaterBillYear?.data?.map(
+                    (data: any) => data.year
+                  ),
                   datasets: [
                     {
-                      label: "Elect",
-                      data: ChartDataElectBillYear.map(
-                        (data) => data.total_bill
-                      ),
-                      backgroundColor: "#FFC700",
-                      borderColor: "#FFC700",
-                    },
-                    {
-                      label: "Water",
-                      data: ChartDataWaterBillYear.map(
-                        (data) => data.total_bill
-                      ),
-                      backgroundColor: "#055C9D",
-                      borderColor: "#055C9D",
+                      label: "ข้อมูลการใช้น้ำ",
+                      data: ChartDataWaterBillYear?.data?.map((data: any) => {
+                        const yearData = ChartDataWaterBillYear?.data?.find(
+                          (item: any) => item.year === data.year
+                        );
+                        return yearData ? yearData.total_bill : null;
+                      }),
+                      backgroundColor: "#000080",
+                      borderColor: "#000080",
                     },
                   ],
                 }}
               />
+              )}
+            </div>
+            <div className="flex justify-center items-center">
+              <h1 className="px-5 pb-2 pt-5 text-black/80 text-[24px] font-[600]">
+                ไฟ
+              </h1>
+            </div>
+            <div className="w-full h-[300px] px-3 py-5">
+              {ChartDataElectBillYear.data !== undefined && (
+                <Bar
+                  data={{
+                    labels: ChartDataElectBillYear?.data?.map(
+                      (data: any) => data.year
+                    ),
+                    datasets: [
+                      {
+                        label: "ข้อมูลการใช้ไฟ",
+                        data: ChartDataElectBillYear?.data?.map((data: any) => {
+                          const yearData = ChartDataElectBillYear?.data?.find(
+                            (item: any) => item.year === data.year
+                          );
+                          return yearData ? yearData.total_bill : null;
+                        }),
+                        backgroundColor: "#FFD700",
+                        borderColor: "#FFD700",
+                      },
+                    ],
+                  }}
+                />
+              )}
             </div>
           </div>
         </div>

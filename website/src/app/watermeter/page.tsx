@@ -1,14 +1,22 @@
 "use client";
 import Layout from "@/layout";
-import { FC, useState,useEffect } from "react";
+import React, { FC, useState, useEffect } from "react";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { axiosConfig } from "@/utils/axiosConfig";
 import Select from "react-select";
+import "react-datepicker/dist/react-datepicker.css";
+import { randomcolour } from "@/utils/colour";
 
 const Watermeter: FC = () => {
+  const [watermeter, setWatermeter] = useState<any>([]);
+  const [selectWatermeter, setSelectWatermeter] = useState<any>([]);
+  const [search, setSearch] = useState("");
+  const [selectedPosition, setSelectedPosition] = useState("ทั้งหมด");
+  const [popupImage, setPopupImage] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
-  const [watermeter, setWatermeter] = useState([]);
   useEffect(() => {
     fetchWatermeter();
   }, []);
@@ -19,15 +27,35 @@ const Watermeter: FC = () => {
       const imageBase64 = response.data.image;
       setWatermeter(imageBase64);
       setWatermeter(response.data);
-      console.log("data: ", response.data);
+      if (response.data) {
+        const categorycolour = response.data?.category.map((category: any) => ({
+          name: category,
+          colour: randomcolour(),
+        }));
+        setWatermeter({
+          category: categorycolour,
+          data: response.data.data,
+        });
+        const categoryfilter = response.data?.category.map((category: any) => ({
+          label: category,
+          value: category,
+        }));
+        setSelectWatermeter([{ label: "ทั้งหมด", value: "ทั้งหมด" }, ...categoryfilter]);
+        console.log("Chart data Water:", response.data);
+      }
     } catch (error) {
       console.error("Error fetching watermeter data:", error);
     }
   };
 
-  const [search, setSearch] = useState("");
-  const [selectedPosition, setSelectedPosition] = useState("ทั้งหมด");
-  const [popupImage, setPopupImage] = useState(null);
+  const goToPreviousPage = () => {
+    setCurrentPage((prevPage) => prevPage - 1);
+  };
+
+  const goToNextPage = () => {
+    setCurrentPage((prevPage) => prevPage + 1);
+  };
+
   const handleImageClick = (imageUrl: any) => {
     setPopupImage(imageUrl);
   };
@@ -35,6 +63,10 @@ const Watermeter: FC = () => {
   const handleClosePopup = () => {
     setPopupImage(null);
   };
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const totalPages = Math.ceil(watermeter?.data?.length / itemsPerPage);
 
   return (
     <Layout>
@@ -66,57 +98,76 @@ const Watermeter: FC = () => {
           <div className="flex justify-start items-center  2xl:w-[17%] xl:w-[20%] lg:w-[28%] w-[35%] flex-wrap">
             <Select
               value={{ label: selectedPosition, value: selectedPosition }}
-              onChange={(selectedOption: any) => setSelectedPosition(selectedOption.value)}
-              options={[
-                { label: "ทั้งหมด", value: "ทั้งหมด" },
-                { label: "ชั้นที่ 1", value: "ชั้นที่ 1" },
-                { label: "ชั้นที่ 2", value: "ชั้นที่ 2" },
-              ]}
+              onChange={(selectedOption: any) => {
+                setSelectedPosition(selectedOption.value)
+                setCurrentPage(1)
+              }}
+              options={selectWatermeter}
             />
           </div>
         </div>
 
         <div className="border-[1px] border-[#e6e6e6] rounded-[9px] py-2 px-8 bg-white my-5 m-auto w-[100%] overflow-x-auto">
-      <div className="flex p-3 gap-3 border-b-2 border-gray-300 w-[92em] ">
-        <h1 className="w-[50%]">วัน-เวลา</h1>
-        <h2 className="w-[50%]">ตำแหน่ง</h2>
-        <h3 className="w-[50%]">เลขมิเตอร์</h3>
-        <h4 className="w-[50%]">รูปภาพ</h4>
-      </div>
-      <div className="w-[92em]">
-        {watermeter?.filter(( item :any) => {
-            if (selectedPosition === "ทั้งหมด") return true;
-            return item.name === selectedPosition;
-          })
-          .filter(( item :any) => {
-            const searchKeywords = search
-              .toLowerCase()
-              .split(",")
-              .map((keyword) => keyword.trim());
-            return (
-              searchKeywords.length === 0 ||
-              searchKeywords.every(
-                (keyword) =>
-                  item.datetime.toLowerCase().includes(keyword) ||
-                  item.name.toLowerCase().includes(keyword)
-              )
-            );
-          })
-          .map(( item :any, idx :any) => (
-            <div
-              key={idx}
-              className="my-2 p-3 flex justify-start items-center gap-3 w-auto rounded-lg hover:bg-blue-200"
+          <div className="flex p-3 gap-3 border-b-2 border-gray-300 w-[92em] ">
+            <h1 className="w-[50%]">วัน-เวลา</h1>
+            <h2 className="w-[50%]">ตำแหน่ง</h2>
+            <h3 className="w-[50%]">เลขมิเตอร์</h3>
+            <h4 className="w-[50%]">รูปภาพ</h4>
+          </div>
+          <div className="w-[92em]">
+            {watermeter?.data
+              ?.filter((item: any) => {
+                if (selectedPosition === "ทั้งหมด") return true;
+                return item.name === selectedPosition;
+              })
+              .filter((item: any) => {
+                const searchKeywords = search
+                  .toLowerCase()
+                  .split(",")
+                  .map((keyword) => keyword.trim());
+                return (
+                  searchKeywords.length === 0 ||
+                  searchKeywords.every(
+                    (keyword) =>
+                      item.datetime.toLowerCase().includes(keyword) || item.name.toLowerCase().includes(keyword)
+                  )
+                );
+              })
+              .slice(startIndex, endIndex)
+              .map((item: any, idx: any) => (
+                <div
+                  key={idx}
+                  className="my-2 p-3 flex justify-start items-center gap-3 w-auto rounded-lg hover:bg-blue-200"
+                >
+                  <p className="text-left w-[50%]">{item.datetime}</p>
+                  <p className="text-left w-[50%]">{item.name}</p>
+                  <p className="text-left w-[50%]">{item.value}</p>
+                  <p
+                    className="text-left w-[50%] underline cursor-pointer"
+                    onClick={() => handleImageClick(`data:image/png;base64,${item.image}`)}
+                  >
+                    รูปภาพ
+                  </p>
+                </div>
+              ))}
+          </div>
+          <div className="flex justify-center mt-4">
+            <button
+              onClick={goToPreviousPage}
+              disabled={currentPage === 1}
+              className="px-4 py-2 bg-gray-200 rounded-md mr-2"
             >
-              <p className="text-left w-[50%]">{item.datetime}</p>
-              <p className="text-left w-[50%]">{item.name}</p>
-              <p className="text-left w-[50%]">{item.value}</p>
-              <p className="text-left w-[50%] underline cursor-pointer" onClick={() => handleImageClick(`data:image/png;base64,${item.image}`)}>
-              รูปภาพ
-            </p>
-            </div>
-          ))}
-      </div>
-    </div>
+              ก่อนหน้า
+            </button>
+            <button
+              onClick={goToNextPage}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 bg-gray-200 rounded-md ml-1"
+            >
+              ถัดไป
+            </button>
+          </div>
+        </div>
       </div>
     </Layout>
   );
