@@ -239,8 +239,6 @@ const Chart: FC = () => {
 
   const [selectedPosition, setSelectedPosition] = useState("ทั้งหมด");
   const [selectedPositionWater, setSelectedPositionWater] = useState("ทั้งหมด");
-  // const repeatTimes = Array.from(new Set(chartDataWater?.data?.map((data: any) => data.time)));
-  // repeatTimes.sort();
   const repeatTimes = Array.from(
     new Set(chartDataWater?.data?.map((data: any) => data.time))
   );
@@ -270,12 +268,25 @@ const Chart: FC = () => {
                       const filterdata = chartDataWater.data.filter(
                         (data: any) => data.name === category.name
                       );
-                      const colour = randomcolour();
+
+                      let tempValue = 0;
+                      const dataPoints = repeatTimes.map((time) => {
+                        const dataPoint = filterdata.find(
+                          (data: any) =>
+                            data.time === time && data.name === category.name
+                        );
+
+                        if (dataPoint === undefined) {
+                          return tempValue;
+                        } else {
+                          tempValue = dataPoint.value;
+                          return dataPoint.value;
+                        }
+                      });
+                      
                       return {
                         label: category.name,
-                        data: filterdata.map((data: any) =>
-                          data.value.toString()
-                        ),
+                        data: dataPoints,
                         backgroundColor: category.colour,
                         borderColor: category.colour,
                       };
@@ -283,7 +294,6 @@ const Chart: FC = () => {
                   }}
                 />
               )}
-              
             </div>
           </div>
           <div className="bg-white w-2/4 h-4/5 rounded-md border border-slate-300 drop-shadow-lg">
