@@ -167,7 +167,7 @@ const Chart: FC = () => {
       console.error("Error fetching chart data Water Bill Month:", error);
     }
   };
-  
+
   const fetchChartDataElectBillYear = async () => {
     try {
       const response = await axiosConfig.get("/api/data_electricbillyear");
@@ -239,6 +239,12 @@ const Chart: FC = () => {
 
   const [selectedPosition, setSelectedPosition] = useState("ทั้งหมด");
   const [selectedPositionWater, setSelectedPositionWater] = useState("ทั้งหมด");
+  // const repeatTimes = Array.from(new Set(chartDataWater?.data?.map((data: any) => data.time)));
+  // repeatTimes.sort();
+  const repeatTimes = Array.from(
+    new Set(chartDataWater?.data?.map((data: any) => data.time))
+  );
+  repeatTimes.sort();
 
   return (
     <Layout>
@@ -259,7 +265,7 @@ const Chart: FC = () => {
               {chartDataWater.data !== undefined && (
                 <Line
                   data={{
-                    labels: chartDataWater?.data?.map((data: any) => data.time),
+                    labels: repeatTimes,
                     datasets: chartDataWater?.category?.map((category: any) => {
                       const filterdata = chartDataWater.data.filter(
                         (data: any) => data.name === category.name
@@ -277,6 +283,7 @@ const Chart: FC = () => {
                   }}
                 />
               )}
+              
             </div>
           </div>
           <div className="bg-white w-2/4 h-4/5 rounded-md border border-slate-300 drop-shadow-lg">
@@ -324,37 +331,33 @@ const Chart: FC = () => {
               </h1>
             </div>
             <div className="w-full h-[300px] px-3 py-5">
-              {
-                ChartDataWaterBillMonth.data !== undefined && (
-                  <Bar
+              {ChartDataWaterBillMonth.data !== undefined && (
+                <Bar
                   data={{
                     labels: ChartDataWaterBillMonth?.data
-                      ?.reduce(
-                        (uniqueMonths: string[], data: any) => {
-                          const monthNames = [
-                            "",
-                            "Jan",
-                            "Feb",
-                            "Mar",
-                            "Apr",
-                            "May",
-                            "Jun",
-                            "Jul",
-                            "Aug",
-                            "Sep",
-                            "Oct",
-                            "Nov",
-                            "Dec",
-                          ];
-                          const monthLabel = monthNames[data.month];
-                          if (!uniqueMonths.includes(monthLabel)) {
-                            uniqueMonths.push(monthLabel);
-                          }
-                          return uniqueMonths;
-                        },
-                        []
-                      )
-                      ?.sort((a:any, b: any) => {
+                      ?.reduce((uniqueMonths: string[], data: any) => {
+                        const monthNames = [
+                          "",
+                          "Jan",
+                          "Feb",
+                          "Mar",
+                          "Apr",
+                          "May",
+                          "Jun",
+                          "Jul",
+                          "Aug",
+                          "Sep",
+                          "Oct",
+                          "Nov",
+                          "Dec",
+                        ];
+                        const monthLabel = monthNames[data.month];
+                        if (!uniqueMonths.includes(monthLabel)) {
+                          uniqueMonths.push(monthLabel);
+                        }
+                        return uniqueMonths;
+                      }, [])
+                      ?.sort((a: any, b: any) => {
                         const monthNames = [
                           "Jan",
                           "Feb",
@@ -389,8 +392,7 @@ const Chart: FC = () => {
                     ),
                   }}
                 />
-                )
-              }
+              )}
             </div>
             <div className="flex justify-center items-center">
               <h1 className="px-5 pb-2 pt-5 text-black/80 text-[24px] font-[600]">
@@ -401,8 +403,8 @@ const Chart: FC = () => {
               {ChartDataElectBillMonth.data !== undefined && (
                 <Bar
                   data={{
-                    labels: ChartDataElectBillMonth?.data?.reduce(
-                      (uniqueMonths: string[], data: any) => {
+                    labels: ChartDataElectBillMonth?.data
+                      ?.reduce((uniqueMonths: string[], data: any) => {
                         const monthNames = [
                           "",
                           "Jan",
@@ -423,26 +425,24 @@ const Chart: FC = () => {
                           uniqueMonths.push(monthLabel);
                         }
                         return uniqueMonths;
-                      },
-                      []
-                    )
-                    ?.sort((a:any, b: any) => {
-                      const monthNames = [
-                        "Jan",
-                        "Feb",
-                        "Mar",
-                        "Apr",
-                        "May",
-                        "Jun",
-                        "Jul",
-                        "Aug",
-                        "Sep",
-                        "Oct",
-                        "Nov",
-                        "Dec",
-                      ];
-                      return monthNames.indexOf(a) - monthNames.indexOf(b);
-                    }),
+                      }, [])
+                      ?.sort((a: any, b: any) => {
+                        const monthNames = [
+                          "Jan",
+                          "Feb",
+                          "Mar",
+                          "Apr",
+                          "May",
+                          "Jun",
+                          "Jul",
+                          "Aug",
+                          "Sep",
+                          "Oct",
+                          "Nov",
+                          "Dec",
+                        ];
+                        return monthNames.indexOf(a) - monthNames.indexOf(b);
+                      }),
                     datasets: ChartDataElectBillMonth?.category?.map(
                       (category: any) => {
                         const filterdata = ChartDataElectBillMonth.data.filter(
@@ -586,25 +586,25 @@ const Chart: FC = () => {
             <div className="w-full h-[300px] px-3 py-5">
               {ChartDataWaterBillYear.data !== undefined && (
                 <Bar
-                data={{
-                  labels: ChartDataWaterBillYear?.data?.map(
-                    (data: any) => data.year
-                  ),
-                  datasets: [
-                    {
-                      label: "ข้อมูลการใช้น้ำ",
-                      data: ChartDataWaterBillYear?.data?.map((data: any) => {
-                        const yearData = ChartDataWaterBillYear?.data?.find(
-                          (item: any) => item.year === data.year
-                        );
-                        return yearData ? yearData.total_bill : null;
-                      }),
-                      backgroundColor: "#000080",
-                      borderColor: "#000080",
-                    },
-                  ],
-                }}
-              />
+                  data={{
+                    labels: ChartDataWaterBillYear?.data?.map(
+                      (data: any) => data.year
+                    ),
+                    datasets: [
+                      {
+                        label: "ข้อมูลการใช้น้ำ",
+                        data: ChartDataWaterBillYear?.data?.map((data: any) => {
+                          const yearData = ChartDataWaterBillYear?.data?.find(
+                            (item: any) => item.year === data.year
+                          );
+                          return yearData ? yearData.total_bill : null;
+                        }),
+                        backgroundColor: "#000080",
+                        borderColor: "#000080",
+                      },
+                    ],
+                  }}
+                />
               )}
             </div>
             <div className="flex justify-center items-center">
