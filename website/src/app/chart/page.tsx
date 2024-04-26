@@ -46,8 +46,6 @@ const Chart: FC = () => {
     fetchChartDataElectBillYear();
     fetchChartDataWaterBillMonthChart();
     fetchChartDataElectBillMonthChart();
-    // fetchChartDataElectBillUnitPerFloor();
-    // fetchChartDataWaterBillUnitPerFloor();
     fetchElectricrmeter();
     fetchWatermeter();
     fetchConfigelectric();
@@ -427,7 +425,24 @@ const Chart: FC = () => {
                         return uniqueMonths;
                       },
                       []
-                    ),
+                    )
+                    ?.sort((a:any, b: any) => {
+                      const monthNames = [
+                        "Jan",
+                        "Feb",
+                        "Mar",
+                        "Apr",
+                        "May",
+                        "Jun",
+                        "Jul",
+                        "Aug",
+                        "Sep",
+                        "Oct",
+                        "Nov",
+                        "Dec",
+                      ];
+                      return monthNames.indexOf(a) - monthNames.indexOf(b);
+                    }),
                     datasets: ChartDataElectBillMonth?.category?.map(
                       (category: any) => {
                         const filterdata = ChartDataElectBillMonth.data.filter(

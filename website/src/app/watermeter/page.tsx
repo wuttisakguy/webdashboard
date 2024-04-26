@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { axiosConfig } from "@/utils/axiosConfig";
 import Select from "react-select";
 import "react-datepicker/dist/react-datepicker.css";
-import { randomcolour } from "@/utils/colour";
+// import { randomcolour } from "@/utils/colour";
 
 const Watermeter: FC = () => {
   const [watermeter, setWatermeter] = useState<any>([]);
@@ -30,10 +30,10 @@ const Watermeter: FC = () => {
       if (response.data) {
         const categorycolour = response.data?.category.map((category: any) => ({
           name: category,
-          colour: randomcolour(),
+          // colour: randomcolour(),
         }));
         setWatermeter({
-          category: categorycolour,
+          // category: categorycolour,
           data: response.data.data,
         });
         const categoryfilter = response.data?.category.map((category: any) => ({
