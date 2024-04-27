@@ -91,7 +91,7 @@ const Setting: FC = () => {
                   </label>
                   <input
                     className="w-full py-2 px-4 rounded-md border-[1px] border-[#595959]/50 mt-2 outline-none"
-                    placeholder="ชื่อ"
+                    placeholder="ค่า FT"
                     {...register("config_elec.ft", { required: "กรอกข้อมูล" })}
                     defaultValue={watch("config_elec.ft")}
                     type="text"
@@ -103,7 +103,7 @@ const Setting: FC = () => {
                   </label>
                   <input
                     className="w-full py-2 px-4 rounded-md border-[1px] border-[#595959]/50 mt-2 outline-none"
-                    placeholder="ชื่อ"
+                    placeholder="ราคาหน่วยละ"
                     {...register("config_elec.unit151_400", {
                       required: "กรอกข้อมูล",
                     })}
@@ -117,7 +117,7 @@ const Setting: FC = () => {
                   </label>
                   <input
                     className="w-full py-2 px-4 rounded-md border-[1px] border-[#595959]/50 mt-2 outline-none"
-                    placeholder="ชื่อ"
+                    placeholder="ราคาหน่วยละ"
                     {...register("config_elec.unit1_150", {
                       required: "กรอกข้อมูล",
                     })}
@@ -131,7 +131,7 @@ const Setting: FC = () => {
                   </label>
                   <input
                     className="w-full py-2 px-4 rounded-md border-[1px] border-[#595959]/50 mt-2 outline-none"
-                    placeholder="ชื่อ"
+                    placeholder="ราคาหน่วยละ"
                     {...register("config_elec.unit401", {
                       required: "กรอกข้อมูล",
                     })}
@@ -166,7 +166,7 @@ const Setting: FC = () => {
                   </label>
                   <input
                     className="w-full py-2 px-4 rounded-md border-[1px] border-[#595959]/50 mt-2 outline-none"
-                    placeholder="ชื่อ"
+                    placeholder="ราคาหน่วยละ"
                     {...register("config_water.waterunit_0_10", {
                       required: "กรอกข้อมูล",
                     })}
@@ -180,7 +180,7 @@ const Setting: FC = () => {
                   </label>
                   <input
                     className="w-full py-2 px-4 rounded-md border-[1px] border-[#595959]/50 mt-2 outline-none"
-                    placeholder="ชื่อ"
+                    placeholder="ราคาหน่วยละ"
                     {...register("config_water.waterunit_11_20", {
                       required: "กรอกข้อมูล",
                     })}
@@ -194,7 +194,7 @@ const Setting: FC = () => {
                   </label>
                   <input
                     className="w-full py-2 px-4 rounded-md border-[1px] border-[#595959]/50 mt-2 outline-none"
-                    placeholder="ชื่อ"
+                    placeholder="ราคาหน่วยละ"
                     {...register("config_water.waterunit_21_30", {
                       required: "กรอกข้อมูล",
                     })}
@@ -208,7 +208,7 @@ const Setting: FC = () => {
                   </label>
                   <input
                     className="w-full py-2 px-4 rounded-md border-[1px] border-[#595959]/50 mt-2 outline-none"
-                    placeholder="ชื่อ"
+                    placeholder="ราคาหน่วยละ"
                     {...register("config_water.waterunit_31_40", {
                       required: "กรอกข้อมูล",
                     })}
@@ -222,7 +222,7 @@ const Setting: FC = () => {
                   </label>
                   <input
                     className="w-full py-2 px-4 rounded-md border-[1px] border-[#595959]/50 mt-2 outline-none"
-                    placeholder="ชื่อ"
+                    placeholder="ราคาหน่วยละ"
                     {...register("config_water.waterunit_41_50", {
                       required: "กรอกข้อมูล",
                     })}
@@ -236,7 +236,7 @@ const Setting: FC = () => {
                   </label>
                   <input
                     className="w-full py-2 px-4 rounded-md border-[1px] border-[#595959]/50 mt-2 outline-none"
-                    placeholder="ชื่อ"
+                    placeholder="ราคาหน่วยละ"
                     {...register("config_water.waterunit_51_60", {
                       required: "กรอกข้อมูล",
                     })}
@@ -250,7 +250,7 @@ const Setting: FC = () => {
                   </label>
                   <input
                     className="w-full py-2 px-4 rounded-md border-[1px] border-[#595959]/50 mt-2 outline-none"
-                    placeholder="ชื่อ"
+                    placeholder="ราคาหน่วยละ"
                     {...register("config_water.waterunit_61_80", {
                       required: "กรอกข้อมูล",
                     })}
@@ -264,7 +264,7 @@ const Setting: FC = () => {
                   </label>
                   <input
                     className="w-full py-2 px-4 rounded-md border-[1px] border-[#595959]/50 mt-2 outline-none"
-                    placeholder="ชื่อ"
+                    placeholder="ราคาหน่วยละ"
                     {...register("config_water.waterunit_81_100", {
                       required: "กรอกข้อมูล",
                     })}
@@ -278,7 +278,7 @@ const Setting: FC = () => {
                   </label>
                   <input
                     className="w-full py-2 px-4 rounded-md border-[1px] border-[#595959]/50 mt-2 outline-none"
-                    placeholder="ชื่อ"
+                    placeholder="ราคาหน่วยละ"
                     {...register("config_water.waterunit_101_120", {
                       required: "กรอกข้อมูล",
                     })}
@@ -292,7 +292,7 @@ const Setting: FC = () => {
                   </label>
                   <input
                     className="w-full py-2 px-4 rounded-md border-[1px] border-[#595959]/50 mt-2 outline-none"
-                    placeholder="ชื่อ"
+                    placeholder="ราคาหน่วยละ"
                     {...register("config_water.waterunit_121_160", {
                       required: "กรอกข้อมูล",
                     })}
@@ -306,7 +306,7 @@ const Setting: FC = () => {
                   </label>
                   <input
                     className="w-full py-2 px-4 rounded-md border-[1px] border-[#595959]/50 mt-2 outline-none"
-                    placeholder="ชื่อ"
+                    placeholder="ราคาหน่วยละ"
                     {...register("config_water.waterunit_161_200", {
                       required: "กรอกข้อมูล",
                     })}
@@ -320,7 +320,7 @@ const Setting: FC = () => {
                   </label>
                   <input
                     className="w-full py-2 px-4 rounded-md border-[1px] border-[#595959]/50 mt-2 outline-none"
-                    placeholder="ชื่อ"
+                    placeholder="ราคาหน่วยละ"
                     {...register("config_water.waterunit_201", {
                       required: "กรอกข้อมูล",
                     })}

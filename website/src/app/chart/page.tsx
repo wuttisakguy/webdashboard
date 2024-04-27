@@ -16,26 +16,14 @@ defaults.responsive = true;
 const Chart: FC = () => {
   const [chartDataWater, setChartDataWater] = useState<any>([]);
   const [chartDataElect, setChartDataElect] = useState<any>([]);
-  const [ChartDataWaterBillMonth, setChartDataWaterBillMonth] = useState<any>(
-    []
-  );
-  const [ChartDataElectBillMonth, setChartDataElectBillMonth] = useState<any>(
-    []
-  );
-  // const [ChartDataElectBillUnitPerFloor, setChartDataElectBillUnitPerFloor] =useState<any[]>([]);
-  // const [ChartDataWaterBillUnitPerFloor, setChartDataWaterBillUnitPerFloor] =useState<any[]>([]);
+  const [ChartDataWaterBillMonth, setChartDataWaterBillMonth] = useState<any>([]);
+  const [ChartDataElectBillMonth, setChartDataElectBillMonth] = useState<any>([]);
   const [ChartDataWaterBillYear, setChartDataWaterBillYear] = useState<any>([]);
   const [ChartDataElectBillYear, setChartDataElectBillYear] = useState<any>([]);
-  const [ChartDataWaterBillMonthChart, setChartDataWaterBillMonthChart] =
-    useState<any[]>([]);
-  const [ChartDatElectBillMonthChart, setChartDataElectBillMonthChart] =
-    useState<any>([]);
-
+  const [ChartDataWaterBillMonthChart, setChartDataWaterBillMonthChart] =useState<any[]>([]);
+  const [ChartDatElectBillMonthChart, setChartDataElectBillMonthChart] =useState<any>([]);
   const [waterrmeter, setWatermeter] = useState([]);
   const [electricrmeter, setElectricrmeter] = useState([]);
-
-  const [configelectric, setConfigelectric] = useState([]);
-  const [configwater, setConfigwater] = useState([]);
 
   useEffect(() => {
     fetchChartDataWater();
@@ -48,29 +36,8 @@ const Chart: FC = () => {
     fetchChartDataElectBillMonthChart();
     fetchElectricrmeter();
     fetchWatermeter();
-    fetchConfigelectric();
-    fetchConfigwater();
+
   }, []);
-
-  const fetchConfigelectric = async () => {
-    try {
-      const response = await axiosConfig.get("/api/configelectric");
-      setElectricrmeter(response.data);
-      console.log("configelect:", response.data);
-    } catch (error) {
-      console.error("Error fetching configelect:", error);
-    }
-  };
-
-  const fetchConfigwater = async () => {
-    try {
-      const response = await axiosConfig.get("/api/configwater");
-      setElectricrmeter(response.data);
-      console.log("configwater:", response.data);
-    } catch (error) {
-      console.error("configwater:", error);
-    }
-  };
 
   const fetchElectricrmeter = async () => {
     try {
@@ -239,10 +206,14 @@ const Chart: FC = () => {
 
   const [selectedPosition, setSelectedPosition] = useState("ทั้งหมด");
   const [selectedPositionWater, setSelectedPositionWater] = useState("ทั้งหมด");
-  const repeatTimes = Array.from(
+  const repeatTimeswater = Array.from(
     new Set(chartDataWater?.data?.map((data: any) => data.time))
   );
-  repeatTimes.sort();
+  const repeatTimesElect = Array.from(
+    new Set(chartDataElect?.data?.map((data: any) => data.time))
+  );
+  repeatTimeswater.sort();
+  repeatTimesElect.sort();
 
   return (
     <Layout>
@@ -263,14 +234,14 @@ const Chart: FC = () => {
               {chartDataWater.data !== undefined && (
                 <Line
                   data={{
-                    labels: repeatTimes,
+                    labels: repeatTimeswater,
                     datasets: chartDataWater?.category?.map((category: any) => {
                       const filterdata = chartDataWater.data.filter(
                         (data: any) => data.name === category.name
                       );
 
                       let tempValue = 0;
-                      const dataPoints = repeatTimes.map((time) => {
+                      const dataPoints = repeatTimeswater.map((time) => {
                         const dataPoint = filterdata.find(
                           (data: any) =>
                             data.time === time && data.name === category.name
@@ -308,24 +279,37 @@ const Chart: FC = () => {
             <div className="w-full h-[300px] px-3 py-5">
               {chartDataElect.data !== undefined && (
                 <Line
-                  data={{
-                    labels: chartDataElect?.data?.map((data: any) => data.time),
-                    datasets: chartDataElect?.category?.map((category: any) => {
-                      const filterdata = chartDataElect.data.filter(
-                        (data: any) => data.name === category.name
+                data={{
+                  labels: repeatTimesElect,
+                  datasets: chartDataElect?.category?.map((category: any) => {
+                    const filterdata = chartDataElect.data.filter(
+                      (data: any) => data.name === category.name
+                    );
+
+                    let tempValue = 0;
+                    const dataPoints = repeatTimesElect.map((time) => {
+                      const dataPoint = filterdata.find(
+                        (data: any) =>
+                          data.time === time && data.name === category.name
                       );
-                      const colour = randomcolour();
-                      return {
-                        label: category.name,
-                        data: filterdata.map((data: any) =>
-                          data.value.toString()
-                        ),
-                        backgroundColor: category.colour,
-                        borderColor: category.colour,
-                      };
-                    }),
-                  }}
-                />
+
+                      if (dataPoint === undefined) {
+                        return tempValue;
+                      } else {
+                        tempValue = dataPoint.value;
+                        return dataPoint.value;
+                      }
+                    });
+                    
+                    return {
+                      label: category.name,
+                      data: dataPoints,
+                      backgroundColor: category.colour,
+                      borderColor: category.colour,
+                    };
+                  }),
+                }}
+              />
               )}
             </div>
           </div>

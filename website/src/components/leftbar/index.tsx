@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDroplet, faBolt, faChartLine, faCamera, faGear } from '@fortawesome/free-solid-svg-icons';
+import { faDroplet, faBolt, faChartLine, faCamera, faGear, faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 
 const Leftbar: FC = () => {
@@ -21,14 +21,14 @@ const Leftbar: FC = () => {
       route: "/chart",
     },
     {
-      icon: faCamera,
-      title: "Camera",
-      link: "http://95.217.158.154:5173/",
-    },
-    {
       icon: faGear,
       title: "Setting",
       route: "/setting",
+    },
+    {
+      icon: faArrowRightFromBracket,
+      title: "Logout",
+      route: "/logout",
     },
     
   ];
@@ -36,7 +36,7 @@ const Leftbar: FC = () => {
     <div className="w-full h-full bg-[#1877F2] 2xl:px-4 xl:px-4 lg:px-4 px-2 py-20 select-none">
       {menuLists.map((item, idx) => (
         <div key={idx}>
-          {item.route ? ( 
+          {item.route && ( 
             <Link href={item.route}>
               <div className="flex 2xl:justify-start xl:justify-start lg:justify-start justify-center items-center gap-10 2xl:p-5 xl:p-5 lg:p-5 py-4 px-2 mb-2 cursor-pointer duration-100 hover:bg-white/20 rounded-lg">
                 <div className="w-[20px]">
@@ -47,18 +47,7 @@ const Leftbar: FC = () => {
                 </p>
               </div>
             </Link>
-          ) : (
-            <a href={item.link} key={idx}>
-              <div className="flex 2xl:justify-start xl:justify-start lg:justify-start justify-center items-center gap-10 2xl:p-5 xl:p-5 lg:p-5 py-4 px-2 mb-2 cursor-pointer duration-100 hover:bg-white/20 rounded-lg">
-                <div className="w-[20px]">
-                  <FontAwesomeIcon icon={item.icon} className="text-white" />
-                </div>
-                <p className="text-[17px] text-white 2xl:block xl:block lg:block hidden">
-                  {item.title}
-                </p>
-              </div>
-            </a>
-          )}
+          )} 
         </div>
       ))}
     </div>

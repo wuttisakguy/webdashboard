@@ -6,7 +6,8 @@ export const axiosConfig = axios.create({
 
 axiosConfig.interceptors.request.use(
     async (config) => {
-        config.headers['Authorization'] = '123'
+        const token = localStorage.getItem("token")
+        config.headers['Authorization'] = token
         return config
     },
     (error) => {
