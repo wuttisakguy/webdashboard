@@ -18,7 +18,7 @@ const Login: FC = () => {
         localStorage.setItem("token", res.data.token)
         toast.success(res.data.message);
         let timer = setInterval(() => {
-          router.push("")
+          router.push("/chart")
           clearInterval(timer)
         },500)
       } else {

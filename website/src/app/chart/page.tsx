@@ -22,8 +22,10 @@ const Chart: FC = () => {
   const [ChartDataElectBillYear, setChartDataElectBillYear] = useState<any>([]);
   const [ChartDataWaterBillMonthChart, setChartDataWaterBillMonthChart] =useState<any[]>([]);
   const [ChartDatElectBillMonthChart, setChartDataElectBillMonthChart] =useState<any>([]);
-  const [waterrmeter, setWatermeter] = useState([]);
-  const [electricrmeter, setElectricrmeter] = useState([]);
+  const [waterrmeter, setWatermeter] = useState<any>([]);
+  const [electricrmeter, setElectricrmeter] = useState<any>([]);
+  const [selectWatermeter, setSelectWatermeter] = useState<any>([]);
+  const [selectElectmeter, setSelectElectmeter] = useState<any>([]);
 
   useEffect(() => {
     fetchChartDataWater();
@@ -42,8 +44,22 @@ const Chart: FC = () => {
   const fetchElectricrmeter = async () => {
     try {
       const response = await axiosConfig.get("/api/datatable_elect");
-      setElectricrmeter(response.data);
-      console.log("Chart data table elect:", response.data);
+      if (response.data) {
+        const categorycolour = response.data?.category.map((category: any) => ({
+          name: category,
+          colour: randomcolour(),
+        }));
+        setElectricrmeter({
+          category: categorycolour,
+          data: response.data.data,
+        });
+        const categoryfilter = response.data?.category.map((category: any) => ({
+          label: category,
+          value: category,
+        }));
+        setSelectElectmeter([{ label: "ทั้งหมด", value: "ทั้งหมด" }, ...categoryfilter]);
+        console.log("Chart data table elect:", response.data);
+      }
     } catch (error) {
       console.error("Error fetching chart data table elect:", error);
     }
@@ -52,8 +68,22 @@ const Chart: FC = () => {
   const fetchWatermeter = async () => {
     try {
       const response = await axiosConfig.get("/api/datatable_water");
-      setWatermeter(response.data);
-      console.log("Chart data table Water:", response.data);
+      if (response.data) {
+        const categorycolour = response.data?.category.map((category: any) => ({
+          name: category,
+          colour: randomcolour(),
+        }));
+        setWatermeter({
+          category: categorycolour,
+          data: response.data.data,
+        });
+        const categoryfilter = response.data?.category.map((category: any) => ({
+          label: category,
+          value: category,
+        }));
+        setSelectWatermeter([{ label: "ทั้งหมด", value: "ทั้งหมด" }, ...categoryfilter]);
+        console.log("Chart data table Water:", response.data);
+      }
     } catch (error) {
       console.error("Error fetching chart data table Water:", error);
     }
@@ -470,15 +500,10 @@ const Chart: FC = () => {
                 <div className="flex justify-start items-center  2xl:w-[17%] xl:w-[20%] lg:w-[28%] w-[35%] flex-wrap">
                   <Select
                     value={{ label: selectedPosition, value: selectedPosition }}
-                    onChange={(selectedOption: any) =>
+                    onChange={(selectedOption: any) => {
                       setSelectedPosition(selectedOption.value)
-                    }
-                    options={[
-                      { label: "ทั้งหมด", value: "ทั้งหมด" },
-                      { label: "ชั้นที่ 1", value: "ชั้นที่ 1" },
-                      { label: "ชั้นที่ 2", value: "ชั้นที่ 2" },
-                      { label: "ชั้นที่ 3", value: "ชั้นที่ 3" },
-                    ]}
+                    }}
+                    options={selectElectmeter}
                   />
                 </div>
                 <div className="border-[1px] border-[#e6e6e6] rounded-[9px] py-2 px-8 bg-white my-5 m-auto w-full overflow-x-auto overflow-y-auto ">
@@ -491,7 +516,7 @@ const Chart: FC = () => {
                     <h4 className="w-[50%]">ค่า unit</h4>
                   </div>
                   <div className="w-full">
-                    {electricrmeter
+                    {electricrmeter?.data
                       ?.filter((item: any) => {
                         if (selectedPosition === "ทั้งหมด") return true;
                         return item.name === selectedPosition;
@@ -524,15 +549,10 @@ const Chart: FC = () => {
                       label: selectedPositionWater,
                       value: selectedPositionWater,
                     }}
-                    onChange={(selectedPositionWater: any) =>
-                      setSelectedPositionWater(selectedPositionWater.value)
-                    }
-                    options={[
-                      { label: "ทั้งหมด", value: "ทั้งหมด" },
-                      { label: "ชั้นที่ 1", value: "ชั้นที่ 1" },
-                      { label: "ชั้นที่ 2", value: "ชั้นที่ 2" },
-                      { label: "ชั้นที่ 3", value: "ชั้นที่ 3" },
-                    ]}
+                    onChange={(selectedOption: any) => {
+                      setSelectedPosition(selectedOption.value)
+                    }}
+                    options={selectWatermeter}
                   />
                 </div>
                 <div className="border-[1px] border-[#e6e6e6] rounded-[9px] py-2 px-8 bg-white my-5 m-auto w-full overflow-x-auto overflow-y-auto h-[50%]">
@@ -544,7 +564,7 @@ const Chart: FC = () => {
                     <h4 className="w-[52%]">ค่า unit</h4>
                   </div>
                   <div className="w-full">
-                    {waterrmeter
+                    {waterrmeter?.data
                       ?.filter((item: any) => {
                         if (selectedPositionWater === "ทั้งหมด") return true;
                         return item.name === selectedPositionWater;
